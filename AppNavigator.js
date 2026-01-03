@@ -1,7 +1,7 @@
 import { getUserData } from './services/user.service'; // Adjust path
-import AdminScreen from './pages/AdminScreen';
-import AdminProducts from './pages/AdminProducts';
-import AdminUsers from './pages/AdminUsers';
+import AdminScreen from './pages/Admin/AdminScreen';
+import AdminProducts from './pages//Admin/AdminProducts';
+import AdminUsers from './pages/Admin/AdminUsers';
 import React, { useEffect, useState } from "react";
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -16,7 +16,8 @@ import SignInScreen from './pages/signInScreen';
 import SignUpScreen from './pages/signUpScreen';
 import ProfileScreen from './pages/profileScreen';
 import WishlistScreen from './pages/wishlistScreen';
-
+import AddProductScreen from './pages/Admin/AddProduct'
+import AddEditUserScreen from'./pages/Admin/AddEditUser'
 // Navigators Initialization
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -41,6 +42,9 @@ function AdminStackScreen() {
   return (
     <AdminStack.Navigator>
       <AdminStack.Screen name="AdminMain" component={AdminScreen} options={{ title: 'Admin' }} />
+      <AdminStack.Screen name="AddProduct" component={AddProductScreen} options={{ title: 'Products Management' }} />
+      <AdminStack.Screen name="AddEditUser" component={AddEditUserScreen} options={{ title: 'User Details' }} 
+/>
       <AdminStack.Screen name="AdminProducts" component={AdminProducts} options={{ title: 'Products Management' }} />
       <AdminStack.Screen name="AdminUsers" component={AdminUsers} options={{ title: 'User Management' }} />
     </AdminStack.Navigator>

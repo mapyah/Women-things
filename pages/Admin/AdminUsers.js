@@ -1,47 +1,37 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, ActivityIndicator, StyleSheet, TouchableOpacity, Image, Alert } from 'react-native';
+import { View, Text, FlatList, ActivityIndicator, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { getProducts } from '../services/product.service'; // Assuming these exist
-// import { deleteProduct } from '../services/admin.service'; 
+// import { getAllUsers } from '../services/admin.service'; 
 
-export default function AdminProducts({ navigation }) {
-  const [products, setProducts] = useState([]);
+export default function AdminUsers() {
+  const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => { fetchProducts(); }, []);
-
-  const fetchProducts = async () => {
-    try {
-      setLoading(true);
+  useEffect(() => {
+    // Mock data fetch - Replace with your actual service call
+    const fetchUsers = async () => {
+      setLoading(false);
       const data = await getProducts();
-      setProducts(data.docs);
-    } catch (err) {
-      Alert.alert("Error", "Could not load products");
-    } finally { setLoading(false); }
-  };
+      setUsers(data);
+    };
+    fetchUsers();
+  }, []);
 
-  const handleDelete = (id) => {
-    Alert.alert("Delete", "Are you sure?", [
-      { text: "Cancel", style: "cancel" },
-      { text: "Delete", style: "destructive", onPress: () => console.log("Delete product", id) }
-    ]);
-  };
-
-  const renderProduct = ({ item }) => (
+  const renderUser = ({ item }) => (
     <View style={styles.productCard}>
-      <Image source={{ uri: item.imgs?.[0] }} style={styles.productImage} />
+      <View style={[styles.avatar, {backgroundColor: item.role === 'admin' ? '#6200ee' : '#ccc'}]}>
+        <Text style={styles.avatarText}>{item.userName.charAt(0)}</Text>
+      </View>
       <View style={styles.productInfo}>
-        <Text style={styles.productName}>{item.title}</Text>
-        <Text style={styles.productPrice}>${item.price?.$numberDecimal || item.price}</Text>
+        <Text style={styles.productName}>{item.userName}</Text>
+        <Text style={styles.productDescription}>{item.userMail}</Text>
+        <Text style={[styles.roleTag, {color: item.role === 'admin' ? '#6200ee' : '#666'}]}>
+          {item.role.toUpperCase()}
+        </Text>
       </View>
-      <View style={styles.actionButtons}>
-        <TouchableOpacity onPress={() => console.log("Edit", item._id)}>
-          <FontAwesome name="pencil" size={20} color="#6200ee" style={styles.icon} />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => handleDelete(item._id)}>
-          <FontAwesome name="trash" size={20} color="red" style={styles.icon} />
-        </TouchableOpacity>
-      </View>
+      <TouchableOpacity onPress={() => Alert.alert("Management", "Manage user permissions?")}>
+        <FontAwesome name="cog" size={24} color="#666" />
+      </TouchableOpacity>
     </View>
   );
 
@@ -49,15 +39,12 @@ export default function AdminProducts({ navigation }) {
     <View style={styles.container}>
       {loading ? <ActivityIndicator size="large" style={styles.center} /> : (
         <FlatList 
-          data={products} 
-          renderItem={renderProduct} 
+          data={users} 
+          renderItem={renderUser} 
           keyExtractor={item => item._id}
           contentContainerStyle={styles.listContainer}
         />
       )}
-      <TouchableOpacity style={styles.fab} onPress={() => console.log("Add Product")}>
-        <FontAwesome name="plus" size={24} color="white" />
-      </TouchableOpacity>
     </View>
   );
 }

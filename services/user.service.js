@@ -19,7 +19,6 @@ export async function removeFromWishlist(productId) {
     throw err.response?.data || err;
   }
 }
-
 export async function getWishlist() {
   try {
     const userData = await getUserData();
@@ -150,7 +149,7 @@ export async function verifyToken() {
 }
 export const getAllUsers = async () => {
   try {
-    const response = await api.get('/api/users'); // Ensure this matches your route
+    const response = await api.get('/api/getusers'); // Ensure this matches your route
     return response.data;
   } catch (error) {
     throw error.response?.data || error;
@@ -160,6 +159,23 @@ export const getAllUsers = async () => {
 export const deleteUser = async (id) => {
   try {
     const response = await api.delete(`/api/users/${id}`);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+export const addUser = async (userData) => {
+  try {
+    const response = await api.post('/api/users', userData);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+export const updateUser = async (id, userData) => {
+  try {
+    const response = await api.put(`/api/users/${id}`, userData);
     return response.data;
   } catch (error) {
     throw error.response?.data || error;

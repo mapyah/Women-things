@@ -9,7 +9,26 @@ const api = axios.create({
     'Content-Type': 'application/json',
   },
 });
+export async function addProduct(productData){
+  try{
+    console.log("productData: ", productData)
+    await api.post('/api/addProduct',{productData})
+  }catch(error){
+    console.error('Error fetching products:', error);
+    throw error;
+  }
 
+}
+export async function updateProduct(id,productData){
+  try{
+    console.log("productData: ", productData)
+    await api.post(`/api/updateProduct/${id}`,{productData})
+  }catch(error){
+    console.error('Error fetching products:', error);
+    throw error;
+  }
+
+}
 // Export function to get products
 export const getProducts = async () => {
   try {
@@ -28,27 +47,13 @@ export const getProductById = async (id) => {
     const response = await api.get(`/api/products/${id}`);
     return response.data;
   } catch (error) {
+    console.log(error);
     console.error('Error fetching product:', error);
     throw error;
   }
 };
-export const addProduct = async (productData) => {
-  try {
-    const response = await api.post('/api/products', productData);
-    return response.data;
-  } catch (error) {
-    throw error.response?.data || error;
-  }
-};
 
-export const updateProduct = async (id, productData) => {
-  try {
-    const response = await api.put(`/api/products/${id}`, productData);
-    return response.data;
-  } catch (error) {
-    throw error.response?.data || error;
-  }
-};
+
 
 export const deleteProduct = async (id) => {
   try {
@@ -59,4 +64,4 @@ export const deleteProduct = async (id) => {
   }
 };
 
-export default { getProducts, getProductById };
+export default { getProducts, getProductById,addProduct };  
