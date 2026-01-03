@@ -56,28 +56,37 @@ export default function WishlistScreen({ navigation }) {
   };
 
   const renderProduct = ({ item }) => (
-    <View style={styles.productCard}>
-      {item.imgs && item.imgs.length > 0 ? (
-        <Image source={{ uri: item.imgs[0] }} style={styles.productImage} />
-      ) : (
-        <View style={styles.imagePlaceholder}>
-          <FontAwesome name="image" size={40} color="#ccc" />
-        </View>
-      )}
-      <View style={styles.productInfo}>
-        <Text style={styles.productName}>{item.title}</Text>
-        <Text style={styles.productPrice}>${item.price && item.price.$numberDecimal 
-    ? item.price.$numberDecimal 
-    : item.price || '0.00'}</Text>
-      </View>
-      {/* Remove button */}
+    <View style={styles.productCard}> 
+      {/* 1. This part handles navigation to details */}
       <TouchableOpacity
-        style={{ padding: 10 }}
+        style={styles.cardContent} 
+        onPress={() => navigation.navigate('ProductDetail', { product: item })}
+      >
+        {item.imgs && item.imgs.length > 0 ? (
+          <Image source={{ uri: item.imgs[0] }} style={styles.productImage} />
+        ) : (
+          <View style={styles.imagePlaceholder}>
+            <FontAwesome name="image" size={40} color="#ccc" />
+          </View>
+        )}
+        
+        <View style={styles.productInfo}>
+          <Text style={styles.productName}>{item.title}</Text>
+          <Text style={styles.productPrice}>
+            ${item.price && item.price.$numberDecimal 
+              ? item.price.$numberDecimal 
+              : item.price || '0.00'}
+          </Text>
+        </View>
+      </TouchableOpacity>
+
+      {/* 2. This part handles removal only */}
+      <TouchableOpacity
+        style={styles.removeButton}
         onPress={async () => {
           try {
             await removeFromWishlist(item._id);
             setWishlist(prev => prev.filter(p => p._id !== item._id));
-            setFilteredWishlist(prev => prev.filter(p => p._id !== item._id));
           } catch (err) {
             console.log('Error removing from wishlist:', err);
           }

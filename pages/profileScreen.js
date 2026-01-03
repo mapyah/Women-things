@@ -1,9 +1,11 @@
 import React,{ useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity,ActivityIndicator, ScrollView } from 'react-native';
+import { View, Alert,Text, StyleSheet, TouchableOpacity,ActivityIndicator, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { logout } from '../services/user.service';
-import { getUser } from '../services/user.service';
-export default function ProfileScreen({ navigation, setIsAuthenticated }) {
+import { getUserData, removeUserData,removeToken } from '../services/user.service';
+import { signOut } from 'firebase/auth';
+import { auth } from '../firebaseConfig';
+export default function ProfileScreen({ navigation }) {
   const [user, setUser] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -15,8 +17,8 @@ export default function ProfileScreen({ navigation, setIsAuthenticated }) {
     try {
       setLoading(true);
       setError(null);
-      const data = await getUser();
-      
+      const data = await getUserData();
+      console.log("data: ",data)
       setUser(data);
     } catch (err) {
       setError(err.message);
@@ -29,10 +31,20 @@ export default function ProfileScreen({ navigation, setIsAuthenticated }) {
 
   const handleLogout = async () => {
     try {
-      await logout();
-      setIsAuthenticated(false);
+      // 2. Sign out from Firebase first
+      // This triggers onAuthStateChanged in AppNavigator, which sets 'user' to null
+      await signOut(auth);
+  
+      // 3. Clear local storage and tokens
+      await removeUserData();
+      await removeToken(); // If this removes the JWT token
+      
+      // Note: You don't need navigation.navigate('SignIn') here. 
+      // AppNavigator will automatically re-render and show the SignIn screen 
+      // because the 'user' state becomes null.
     } catch (err) {
       console.log('Error logging out:', err);
+      Alert.alert("Error", "Failed to logout. Please try again.");
     }
   };
   if (loading) {

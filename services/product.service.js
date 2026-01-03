@@ -32,5 +32,31 @@ export const getProductById = async (id) => {
     throw error;
   }
 };
+export const addProduct = async (productData) => {
+  try {
+    const response = await api.post('/api/products', productData);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+export const updateProduct = async (id, productData) => {
+  try {
+    const response = await api.put(`/api/products/${id}`, productData);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+export const deleteProduct = async (id) => {
+  try {
+    const response = await api.delete(`/api/products/${id}`);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
 
 export default { getProducts, getProductById };

@@ -1,4 +1,3 @@
-// services/products.service.js
 import axios from 'axios';
 import config from '../config/apiUser';
 import * as SecureStore from 'expo-secure-store';
@@ -12,7 +11,9 @@ const api = axios.create({
 });
 export async function removeFromWishlist(productId) {
   try {
-    const res = await api.delete(`/api/wishlist/${productId}`);
+    const userData = await getUserData(); // Get locally stored email
+
+    const res = await api.post(`/api/wishlist/${productId}`,{ userMail: userData?.userMail });
     return res.data;
   } catch (err) {
     throw err.response?.data || err;
@@ -21,7 +22,9 @@ export async function removeFromWishlist(productId) {
 
 export async function getWishlist() {
   try {
-    const res = await api.get("/api/getWishlist"); // JWT is attached via interceptor
+    const userData = await getUserData();
+    console.log(userData?.userMail) // Get locally stored email
+    const res = await api.post("/api/getWishlist",{ userMail: userData?.userMail }); // JWT is attached via interceptor
     return res.data; // Array of products  
   } catch (err) { 
     console.log("Error fetching wishlist:", err.response?.data  || err); 
@@ -29,15 +32,38 @@ export async function getWishlist() {
   }   
 }  
  
-export async function getUser() {
+export async function getUser(userMail) {
   try {
-    const res = await api.get("/api/getuser"); // JWT is attached via interceptor
-    return res.data; // Array of products  
+
+    const res = await api.post("/api/getuser",{ userMail});
+     // JWT is attached via interceptor
+    const  UserData={
+      userName: res.data.userName,
+      userMail:res.data.userMail,
+      role: res.data.role
+     }
+     await saveUserData(UserData);  
+     console.log("role: ",UserData.role);
   } catch (err) { 
     console.log("Error fetching wishlist:", err.response?.data  || err); 
-    throw err.response?.data;  
+    throw err.response?.data; 
   }   
 }  
+export async function saveUserData(userData) {
+  // userData = { userName: 'John', userMail: 'john@mail.com' }
+  await SecureStore.setItemAsync('user_data', JSON.stringify(userData));
+}
+
+// Retrieve User Data
+export async function getUserData() {
+  const data = await SecureStore.getItemAsync('user_data');
+  return data ? JSON.parse(data) : null;
+}
+
+// Remove User Data (Clear on Logout)
+export async function removeUserData() {
+  await SecureStore.deleteItemAsync('user_data');
+}
 // Store token securely
 export async function saveToken(token) {
   await SecureStore.setItemAsync('jwt', token);
@@ -69,6 +95,11 @@ api.interceptors.request.use(async (config) => {
 export async function signup(userName, userMail, userPassword) {
   try {
     const res = await api.post('/api/signup', { userName, userMail, userPassword });
+    await saveUserData({
+      userName: res.data.userName,
+      userMail: res.data.userMail,
+      role: res.data.role
+  });
     return res.data;
   } catch (err) {
     throw err.response?.data; 
@@ -78,7 +109,9 @@ export async function signup(userName, userMail, userPassword) {
 
 export async function addToWishlist(productId) {
   try {
-    const res = await api.post(`/api/wishlist/${productId}`);
+    const userData = await getUserData(); // Get locally stored email
+
+    const res = await api.post(`/api/wishlist/${productId}`,{ userMail: userData?.userMail });
     return res.data; // contains updated wishlist
   } catch (err) {
     throw err.response?.data;
@@ -115,8 +148,37 @@ export async function verifyToken() {
     return { success: false, message: 'Invalid or expired token' };
   }
 }
+export const getAllUsers = async () => {
+  try {
+    const response = await api.get('/api/users'); // Ensure this matches your route
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
 
+export const deleteUser = async (id) => {
+  try {
+    const response = await api.delete(`/api/users/${id}`);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
 
 export async function logout() {
   await removeToken();
 }
+export default { 
+  signin,
+  signup,
+  logout,
+  getWishlist,
+  getUser,
+  addToWishlist,
+  removeFromWishlist,
+  getAllUsers,
+  deleteUser,
+  getUserData,
+  saveUserData
+};

@@ -11,10 +11,14 @@ import {
   Platform,
   ScrollView
 } from 'react-native';
-import { signin } from '../services/user.service';
+// 1. Import Firebase Authentication functions and your auth instance
+import { signInWithEmailAndPassword } from 'firebase/auth'; // <--- ADD THIS
+import { auth } from '../firebaseConfig'; // <--- ADD THIS (assuming '../fireBaseConfig.js' exports `auth` as named export)
+import { saveUserData,getUser } from '../services/user.service';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 
-const SignInScreen = ({ navigation, setIsAuthenticated }) => {
+// Remove setIsAuthenticated from props, as AppNavigator handles state via onAuthStateChanged
+const SignInScreen = ({ navigation }) => { // <--- CHANGE IS HERE
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -28,13 +32,31 @@ const SignInScreen = ({ navigation, setIsAuthenticated }) => {
 
     setLoading(true);
     try {
-      const response = await signin(email, password);
+      await getUser(email.trim().toLowerCase());
 
-      Alert.alert('Success', 'Signed in successfully');
-      setIsAuthenticated(true);
+      // 2. Use Firebase's signInWithEmailAndPassword
+      await signInWithEmailAndPassword(auth, email.trim().toLowerCase(), password); // <--- CHANGE IS HERE
+
+     
+      
     } catch (error) {
-      console.log(error.response);
-      Alert.alert('Error', error.response?.data?.message || 'Failed to sign in');
+      // 3. Handle Firebase-specific authentication errors
+      let errorMessage = 'Failed to sign in. Please try again.';
+      
+      if (error.code === 'auth/invalid-email') {
+        errorMessage = 'Invalid email address.';
+      } else if (error.code === 'auth/user-disabled') {
+        errorMessage = 'This user account has been disabled.';
+      } else if (error.code === 'auth/user-not-found') {
+        errorMessage = 'No user found with this email.';
+      } else if (error.code === 'auth/wrong-password') {
+        errorMessage = 'Incorrect password.';
+      } else if (error.code === 'auth/invalid-credential') {
+        errorMessage = 'Invalid credentials. Please check your email and password.';
+      }
+
+      Alert.alert('Error', errorMessage);
+      console.error('Firebase Sign-In Error:', error); // Log the full error for debugging
     } finally {
       setLoading(false);
     }

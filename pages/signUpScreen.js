@@ -1,19 +1,23 @@
 import React, { useState } from 'react';
-import { 
-  View, 
-  Text, 
-  TextInput, 
-  TouchableOpacity, 
-  StyleSheet, 
-  Alert, 
-  KeyboardAvoidingView, 
-  Platform, 
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
   ScrollView,
   ActivityIndicator
 } from 'react-native';
-import { signup } from '../services/user.service'; 
+// 1. Import Firebase Auth related functions and your auth instance
+import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
+import { auth, db } from '../firebaseConfig'; // <--- IMPORT 'db' HERE
+import { doc, setDoc } from 'firebase/firestore'; // <--- Make sure serverTimestamp is included here!
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-
+import { signup } from '../services/user.service'; 
+import { saveUserData,getUser } from '../services/user.service';
 export default function SignUpScreen({ navigation }) {
   const [userName, setUserName] = useState('');
   const [userMail, setUserMail] = useState('');
@@ -22,6 +26,9 @@ export default function SignUpScreen({ navigation }) {
   const [showPassword, setShowPassword] = useState(false);
 
   const handleSignUp = async () => {
+    // Basic validation
+    
+
     if (!userName || !userMail || !userPassword) {
       Alert.alert('Error', 'Please fill out all fields.');
       return;
@@ -29,11 +36,45 @@ export default function SignUpScreen({ navigation }) {
 
     setLoading(true);
     try {
-      await signup(userName, userMail, userPassword);
+      await signup(userName, userMail.trim().toLowerCase(), userPassword);
+      console.log(userMail.trim().toLowerCase())
+      await getUser(userMail.trim().toLowerCase());
+      // 2. Create the user in Firebase Authentication
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        userMail.trim().toLowerCase(),
+        userPassword
+      );
+      const user = userCredential.user; // Get the user object with its UID
+
+      // 3. Update the profile to include the Username (in Firebase Auth)
+      await updateProfile(user, {
+        displayName: userName,
+      });
+
+     
+      
       Alert.alert('Success', 'Account created successfully!');
-      navigation.navigate('SignIn');
+
+      /* NOTE: You don't strictly need navigation.navigate('SignIn')
+         if your AppNavigator is listening to onAuthStateChanged.
+         Firebase will log the user in automatically, and the
+         AppNavigator will flip to the Home screen.
+      */
     } catch (error) {
-      Alert.alert('Error', error.response?.data?.message || 'Signup failed.');
+      // 5. Handle Firebase specific errors
+      let errorMessage = 'Signup failed. Please try again.';
+
+      if (error.code === 'auth/email-already-in-use') {
+        errorMessage = 'That email address is already in use!';
+      } else if (error.code === 'auth/invalid-email') {
+        errorMessage = 'That email address is invalid!';
+      } else if (error.code === 'auth/weak-password') {
+        errorMessage = 'The password is too weak.';
+      }
+
+      Alert.alert('Error', errorMessage);
+      console.error(error);
     } finally {
       setLoading(false);
     }
@@ -50,10 +91,10 @@ export default function SignUpScreen({ navigation }) {
 
         <TextInput
           style={styles.input}
-          placeholder="Username"
+          placeholder="Username" 
           value={userName}
           onChangeText={setUserName}
-          autoCapitalize="none"
+          autoCapitalize="words"
         />
 
         <TextInput
@@ -82,9 +123,9 @@ export default function SignUpScreen({ navigation }) {
           </TouchableOpacity>
         </View>
 
-        <TouchableOpacity 
-          style={[styles.button, loading && { opacity: 0.6 }]} 
-          onPress={handleSignUp} 
+        <TouchableOpacity
+          style={[styles.button, loading && { opacity: 0.6 }]}
+          onPress={handleSignUp}
           disabled={loading}
         >
           {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Sign Up</Text>}
@@ -97,6 +138,7 @@ export default function SignUpScreen({ navigation }) {
     </KeyboardAvoidingView>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {
