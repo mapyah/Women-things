@@ -36,7 +36,8 @@ export default function SignUpScreen({ navigation }) {
 
     setLoading(true);
     try {
-      await signup(userName, userMail.trim().toLowerCase(), userPassword);
+      const role ="user";
+      await signup(userName, userMail.trim().toLowerCase(), userPassword,role);
       console.log(userMail.trim().toLowerCase())
       await getUser(userMail.trim().toLowerCase());
       // 2. Create the user in Firebase Authentication

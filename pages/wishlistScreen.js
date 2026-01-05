@@ -144,7 +144,11 @@ export default function WishlistScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#fff" },
+  removeButton: {
+    position: 'absolute',
+    right: 10, 
+    top: 10,   
+  },  container: { flex: 1, backgroundColor: "#fff" },
   listContainer: { padding: 15 },
   productCard: {
     flexDirection: "row",

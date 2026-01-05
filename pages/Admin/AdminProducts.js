@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, ActivityIndicator, StyleSheet, TouchableOpacity, Image, Alert } from 'react-native';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { getProducts } from '../../services/product.service'; // Assuming these exist
-// import { deleteProduct } from '../services/admin.service'; 
+import { deleteProduct } from '../../services/product.service'; 
 
 export default function AdminProducts({ navigation }) {
   const [products, setProducts] = useState([]);
@@ -23,8 +23,22 @@ export default function AdminProducts({ navigation }) {
   const handleDelete = (id) => {
     Alert.alert("Delete", "Are you sure?", [
       { text: "Cancel", style: "cancel" },
-      { text: "Delete", style: "destructive", onPress: () => console.log("Delete product", id) }
+      { text: "Delete", style: "destructive", onPress: () => {
+        try {
+           deleteProduct(id); 
+          
+          fetchProducts(); 
+          
+          
+        } catch (error) {
+          console.error("Failed to delete:", error);
+          Alert.alert("Error", "Could not delete product.");
+        }
+      },
+     }
+
     ]);
+
   };
 
   const renderProduct = ({ item }) => (
@@ -35,7 +49,7 @@ export default function AdminProducts({ navigation }) {
         <Text style={styles.productPrice}>${item.price?.$numberDecimal || item.price}</Text>
       </View>
       <View style={styles.actionButtons}>
-        <TouchableOpacity onPress={() => console.log("Edit", item._id)}>
+        <TouchableOpacity onPress={() =>navigation.navigate('EditProducts', { product: item })}>
           <FontAwesome name="pencil" size={20} color="#6200ee" style={styles.icon} />
         </TouchableOpacity>
         <TouchableOpacity onPress={() => handleDelete(item._id)}>

@@ -1,7 +1,9 @@
 import axios from 'axios';
 import config from '../config/apiUser';
 import * as SecureStore from 'expo-secure-store';
-
+import { initializeApp, getApp } from 'firebase/app';
+import { getAuth, createUserWithEmailAndPassword, signOut } from 'firebase/auth';
+import { firebaseConfig,auth } from '../firebaseConfig'; 
 const api = axios.create({
   baseURL: config.apiUrl,
   timeout: 10000,
@@ -91,9 +93,9 @@ api.interceptors.request.use(async (config) => {
 });
 
 
-export async function signup(userName, userMail, userPassword) {
+export async function signup(userName, userMail, userPassword,role) {
   try {
-    const res = await api.post('/api/signup', { userName, userMail, userPassword });
+    const res = await api.post('/api/signup', { userName, userMail, userPassword,role });
     await saveUserData({
       userName: res.data.userName,
       userMail: res.data.userMail,
@@ -158,7 +160,7 @@ export const getAllUsers = async () => {
 
 export const deleteUser = async (id) => {
   try {
-    const response = await api.delete(`/api/users/${id}`);
+    const response = await api.delete(`/api/delete/${id}`);
     return response.data;
   } catch (error) {
     throw error.response?.data || error;
@@ -166,7 +168,7 @@ export const deleteUser = async (id) => {
 };
 export const addUser = async (userData) => {
   try {
-    const response = await api.post('/api/users', userData);
+    const response = await api.post('/api/addUSer', userData);
     return response.data;
   } catch (error) {
     throw error.response?.data || error;
@@ -175,12 +177,13 @@ export const addUser = async (userData) => {
 
 export const updateUser = async (id, userData) => {
   try {
-    const response = await api.put(`/api/users/${id}`, userData);
+    const response = await api.put(`/api/update/${id}`, userData);
     return response.data;
   } catch (error) {
     throw error.response?.data || error;
   }
 };
+
 
 export async function logout() {
   await removeToken();

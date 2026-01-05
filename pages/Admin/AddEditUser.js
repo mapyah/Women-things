@@ -1,17 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { 
   View, Text, TextInput, TouchableOpacity, StyleSheet, 
   Alert, ActivityIndicator, ScrollView 
 } from 'react-native';
-import { addUser, updateUser } from '../services/user.service';
+import { addUser, updateUser } from '../../services/user.service';
+import FontAwesome from '@expo/vector-icons/FontAwesome'; // 🔑 Import icons
 
 export default function AddEditUserScreen({ route, navigation }) {
-  const existingUser = route.params?.user; // If null, we are in "Add" mode
+  const existingUser = route.params?.user;
   const isEdit = !!existingUser;
 
   const [userName, setUserName] = useState(existingUser?.userName || '');
   const [userMail, setUserMail] = useState(existingUser?.userMail || '');
-  const [userPassword, setUserPassword] = useState(''); // Only needed for new users
+  const [userPassword, setUserPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false); // 🔑 State for visibility
   const [role, setRole] = useState(existingUser?.role || 'user');
   const [loading, setLoading] = useState(false);
 
@@ -67,13 +69,25 @@ export default function AddEditUserScreen({ route, navigation }) {
         {!isEdit && (
           <>
             <Text style={styles.label}>Password</Text>
-            <TextInput 
-              style={styles.input} 
-              value={userPassword} 
-              onChangeText={setUserPassword} 
-              secureTextEntry 
-              placeholder="Min 6 characters"
-            />
+            <View style={styles.passwordContainer}>
+              <TextInput 
+                style={styles.passwordInput} 
+                value={userPassword} 
+                onChangeText={setUserPassword} 
+                secureTextEntry={!showPassword} // 🔑 Toggle secure entry
+                placeholder="Min 6 characters"
+              />
+              <TouchableOpacity 
+                onPress={() => setShowPassword(!showPassword)}
+                style={styles.eyeIcon}
+              >
+                <FontAwesome 
+                  name={showPassword ? "eye" : "eye-slash"} 
+                  size={20} 
+                  color="#666" 
+                />
+              </TouchableOpacity>
+            </View>
           </>
         )}
 
@@ -106,6 +120,25 @@ const styles = StyleSheet.create({
   form: { marginTop: 10 },
   label: { fontSize: 14, fontWeight: '600', color: '#666', marginBottom: 5, marginTop: 15 },
   input: { borderWidth: 1, borderColor: '#ddd', borderRadius: 8, padding: 12, fontSize: 16, backgroundColor: '#f9f9f9' },
+  
+  // 🔑 Added styles for Password Container
+  passwordContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    backgroundColor: '#f9f9f9',
+  },
+  passwordInput: {
+    flex: 1,
+    padding: 12,
+    fontSize: 16,
+  },
+  eyeIcon: {
+    padding: 12,
+  },
+
   roleRow: { flexDirection: 'row', gap: 10, marginTop: 5 },
   roleButton: { flex: 1, padding: 12, borderRadius: 8, borderWidth: 1, borderColor: '#ddd', alignItems: 'center' },
   roleButtonActive: { backgroundColor: '#6200ee', borderColor: '#6200ee' },

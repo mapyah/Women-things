@@ -16,8 +16,9 @@ import SignInScreen from './pages/signInScreen';
 import SignUpScreen from './pages/signUpScreen';
 import ProfileScreen from './pages/profileScreen';
 import WishlistScreen from './pages/wishlistScreen';
-import AddProductScreen from './pages/Admin/AddProduct'
-import AddEditUserScreen from'./pages/Admin/AddEditUser'
+import AddProductScreen from './pages/Admin/AddProduct';
+import AddEditUserScreen from'./pages/Admin/AddEditUser';
+import EditProductScreen from'./pages/Admin/UpdateProduct';
 // Navigators Initialization
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -43,9 +44,10 @@ function AdminStackScreen() {
     <AdminStack.Navigator>
       <AdminStack.Screen name="AdminMain" component={AdminScreen} options={{ title: 'Admin' }} />
       <AdminStack.Screen name="AddProduct" component={AddProductScreen} options={{ title: 'Products Management' }} />
-      <AdminStack.Screen name="AddEditUser" component={AddEditUserScreen} options={{ title: 'User Details' }} 
-/>
+      <AdminStack.Screen name="AddEditUser" component={AddEditUserScreen} options={{ title: 'User Details' }} />
       <AdminStack.Screen name="AdminProducts" component={AdminProducts} options={{ title: 'Products Management' }} />
+      <AdminStack.Screen name="EditProducts" component={EditProductScreen} options={{ title: 'Products Management' }} />
+
       <AdminStack.Screen name="AdminUsers" component={AdminUsers} options={{ title: 'User Management' }} />
     </AdminStack.Navigator>
   );

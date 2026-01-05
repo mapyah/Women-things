@@ -21,7 +21,6 @@ export async function addProduct(productData){
 }
 export async function updateProduct(id,productData){
   try{
-    console.log("productData: ", productData)
     await api.post(`/api/updateProduct/${id}`,{productData})
   }catch(error){
     console.error('Error fetching products:', error);
@@ -57,7 +56,8 @@ export const getProductById = async (id) => {
 
 export const deleteProduct = async (id) => {
   try {
-    const response = await api.delete(`/api/products/${id}`);
+    console.log("id in del: ",id);
+    const response = await api.delete(`/api/delete/${id}`);
     return response.data;
   } catch (error) {
     throw error.response?.data || error;

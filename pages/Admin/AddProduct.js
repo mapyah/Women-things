@@ -29,7 +29,7 @@ export default function AddProductScreen({ navigation }) {
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       aspect: [1, 1],
-      quality: 0.5, // Keep quality low for Base64 storage
+      quality: 0.2, // Keep quality low for Base64 storage
       base64: true, // 🔑 This is the critical part
     });
 

@@ -4,7 +4,7 @@ import {
   Image, StyleSheet, Alert, ActivityIndicator 
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
-import { updateProduct } from '../../services/products.service'; // Adjust path
+import { updateProduct } from '../../services/product.service'; // Adjust path
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 
 export default function EditProductScreen({ route, navigation }) {
@@ -25,7 +25,7 @@ export default function EditProductScreen({ route, navigation }) {
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       aspect: [1, 1],
-      quality: 0.4, // Compressed for Base64 storage
+      quality: 0.2, // Compressed for Base64 storage
       base64: true,
     });
 
@@ -48,7 +48,6 @@ export default function EditProductScreen({ route, navigation }) {
         desc,
         price: parseFloat(price),
         categorie,
-        stock: parseInt(stock),
         imgs: images
       };
 
