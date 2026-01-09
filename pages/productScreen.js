@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   Linking,
   Dimensions,
+  Alert,
 } from 'react-native';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 
@@ -36,7 +37,7 @@ export default function ProductScreen({ route, navigation }) {
     const total = (product.price * quantity).toFixed(2);
     const message = `Hello, I want to purchase ${quantity} of ${product.title}(s) `;
   
-    const url = `whatsapp://send?phone=${phoneNumber}&text=${encodeURIComponent(message)}`;
+    const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
   
     Linking.canOpenURL(url)
       .then((supported) => {

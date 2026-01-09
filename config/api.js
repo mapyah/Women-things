@@ -2,7 +2,7 @@ import Constants from 'expo-constants';
 
 const ENV = {
   dev: {
-    apiUrl: 'http://192.168.100.45:3000', 
+    apiUrl: 'http://172.20.10.3:3000', 
 
   },
   prod: {

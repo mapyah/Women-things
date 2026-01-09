@@ -120,6 +120,13 @@ export default function WishlistScreen({ navigation }) {
     return (
       <View style={styles.centerContainer}>
         <Text style={styles.emptyText}>No products found in your wishlist</Text>
+        <TouchableOpacity
+        style={styles.refreshButton}
+        onPress={fetchWishlist}
+        activeOpacity={0.8}
+      >
+        <Text style={styles.refreshButtonText}>Refresh</Text>
+      </TouchableOpacity>
       </View>
     );
   }
@@ -180,4 +187,18 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   retryButtonText: { color: "#fff" },
+  refreshButton: {
+  marginTop: 20,
+  paddingHorizontal: 24,
+  paddingVertical: 12,
+  backgroundColor: '#6200ee',
+  borderRadius: 10,
+},
+
+refreshButtonText: {
+  color: '#fff',
+  fontSize: 16,
+  fontWeight: 'bold',
+},
+
 });
